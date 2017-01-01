@@ -14,8 +14,8 @@
 key() -> union(?KEYS).
 value() -> integer().
 
-%% A simple statem test for the process dictionary; tests the
-%% operations erlang:put/2, erlang:get/1, erlang:erase/1.
+%% A simple statem test for a RESTful dict service; tests the
+%% operations restdict:put/2, restdict:get/1, restdict:erase/1.
 
 test() ->
     test(100).
@@ -35,17 +35,17 @@ prop_pdict() ->
 	    end).
 
 clean_up() ->
-    lists:foreach(fun(Key) -> erlang:erase(Key) end, ?KEYS).
+    lists:foreach(fun(Key) -> restdict:erase(Key) end, ?KEYS).
 
 initial_state() -> [].
 
 -spec command([{key(),value()}]) -> proper_types:type().
 command([]) ->
-    {call,erlang,put,[key(), value()]};
+    {call,restdict,put,[key(), value()]};
 command(State) ->
-    union([{call,erlang,put,[key(),value()]},
-	   {call,erlang,get,[key(State)]},
-	   {call,erlang,erase,[key(State)]}]).
+    union([{call,restdict,put,[key(),value()]},
+	   {call,restdict,get,[key(State)]},
+	   {call,restdict,erase,[key(State)]}]).
 
 key(State) ->
     ?LET({Key,_}, elements(State), Key).
@@ -54,25 +54,25 @@ precondition(_, _) ->
     true.
 
 %% Set the right preconditions:
-%% precondition(State, {call,erlang,get,[Key]}) ->
+%% precondition(State, {call,restdict,get,[Key]}) ->
 %%     proplists:is_defined(Key, State);
-%% precondition(State, {call,erlang,erase,[Key]}) ->
+%% precondition(State, {call,restdict,erase,[Key]}) ->
 %%     proplists:is_defined(Key, State);
-%% precondition(_, {call,erlang,put,[_K, _V]}) ->
+%% precondition(_, {call,restdict,put,[_K, _V]}) ->
 %%     true.
 
-postcondition(State, {call,erlang,put,[Key,_]}, undefined) ->
+postcondition(State, {call,restdict,put,[Key,_]}, undefined) ->
     not proplists:is_defined(Key, State);
-postcondition(State, {call,erlang,put,[Key,_]}, Old) ->
+postcondition(State, {call,restdict,put,[Key,_]}, Old) ->
     {Key,Old} =:= proplists:lookup(Key, State);
-postcondition(State, {call,erlang,get,[Key]}, Val) ->
+postcondition(State, {call,restdict,get,[Key]}, Val) ->
     {Key,Val} =:= proplists:lookup(Key, State);
-postcondition(State, {call,erlang,erase,[Key]}, Val) ->
+postcondition(State, {call,restdict,erase,[Key]}, Val) ->
     {Key,Val} =:= proplists:lookup(Key, State).
 
-next_state(State, _Var, {call,erlang,put,[Key,Value]}) ->
+next_state(State, _Var, {call,restdict,put,[Key,Value]}) ->
     [{Key,Value}|proplists:delete(Key, State)];
-next_state(State, _Var, {call,erlang,erase,[Key]}) ->
+next_state(State, _Var, {call,restdict,erase,[Key]}) ->
     proplists:delete(Key, State);
-next_state(State, _Var, {call,erlang,get,[_]}) ->
+next_state(State, _Var, {call,restdict,get,[_]}) ->
     State.
