@@ -1,8 +1,10 @@
+.PHONY: test
 test: kv_store/kv_store restdict.beam test_kv_store.beam
 	kv_store/kv_store &
 	erl -noshell -eval 'proper:module(test_kv_store)' -s init stop
 	killall kv_store
 
+.PHONY: clean
 clean:
 	rm *.beam
 
