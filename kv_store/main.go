@@ -14,6 +14,7 @@ func main() {
 	handleFunc("/get/", handleGet)
 	handleFunc("/erase/", handleErase)
 	handleFunc("/reset/", handleReset)
+	handleFunc("/", handleRoot)
 	http.ListenAndServe(":1234", nil)
 }
 
@@ -58,5 +59,10 @@ func handleErase(w http.ResponseWriter, args []string) (error, int) {
 
 func handleReset(w http.ResponseWriter, args []string) (error, int) {
 	dict = make(map[string]string)
+	return nil, 200
+}
+
+func handleRoot(w http.ResponseWriter, args []string) (error, int) {
+	fmt.Fprintf(w, "%v", dict)
 	return nil, 200
 }
