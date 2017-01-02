@@ -54,16 +54,18 @@ command(State) ->
 key(State) ->
 	?LET({Key,_}, elements(State), Key).
 
-precondition(_, _) ->
-	true.
+%precondition(_, _) ->
+	%true.
 
 %% Set the right preconditions:
-%% precondition(State, {call,kv_store,get,[Key]}) ->
-%%	proplists:is_defined(Key, State);
-%% precondition(State, {call,kv_store,erase,[Key]}) ->
-%%	proplists:is_defined(Key, State);
-%% precondition(_, {call,kv_store,put,[_K, _V]}) ->
-%%	true.
+precondition(State, {call,kv_store,get,[Key]}) ->
+	proplists:is_defined(Key, State);
+precondition(State, {call,kv_store,erase,[Key]}) ->
+	proplists:is_defined(Key, State);
+precondition(_, {call,kv_store,put,[_K, _V]}) ->
+	true;
+precondition(_, {call,kv_store,reset,[]}) ->
+	true.
 
 postcondition(State, {call,kv_store,put,[Key,_]}, '') ->
 	not proplists:is_defined(Key, State);
