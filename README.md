@@ -32,8 +32,11 @@ The tests should pass.
 Now let's try introducing a bug into the web service and seeing if it's
 detected.
 
-	sed -i 's#delete#// delete#' kv_store/main.go
-	git diff
+	$EDITOR kv_store/main.go
+
+Remove the line that deletes the entry from the global variable called dict.
+Now let's see if the test catches the bug:
+
 	make test
 
 The test should fail with a shrunken example like this:
@@ -46,7 +49,7 @@ The test should fail with a shrunken example like this:
 	State: []
 	Res: {postcondition,false}
 
-That means that calling the kv_store web service with 
+That means that calling the kv_store web service with
 
 	GET /put/a/0
 	GET /erase/a
@@ -60,11 +63,15 @@ of calls:
 
 	kv_store/kv_store &
 	kvs=localhost:1234
-	curl $kvs/put/a/0  # ==> no output
-	curl $kvs/erase/a  # ==> 0
-	curl $kvs/put/a/0  # ==> 0 
+	curl $kvs/put/a/0  # ==> no output, as expected
+	curl $kvs/erase/a  # ==> 0, as expected
+	curl $kvs/put/a/0  # ==> 0, whoops!
 
 That's funny: the last call to put returns 0 but it should behave just like the
-first call to put. It looks like erase is failing to do it's job, as we were
-pretending not to know.
+first call to put. It looks like erase is failing to do its job, as we were
+pretending not to know. Let's put things back the way they were.
 
+	killall kv_store
+	git checkout .
+
+See if you can fool the test by introducing a bug of your own.
