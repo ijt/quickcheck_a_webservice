@@ -13,6 +13,7 @@ func main() {
 	handleFunc("/put/", handlePut)
 	handleFunc("/get/", handleGet)
 	handleFunc("/erase/", handleErase)
+	handleFunc("/reset/", handleReset)
 	http.ListenAndServe(":1234", nil)
 }
 
@@ -52,5 +53,10 @@ func handleErase(w http.ResponseWriter, args []string) (error, int) {
 	oldVal := dict[key]
 	delete(dict, key)
 	w.Write([]byte(oldVal))
+	return nil, 200
+}
+
+func handleReset(w http.ResponseWriter, args []string) (error, int) {
+	dict = make(map[string]string)
 	return nil, 200
 }
