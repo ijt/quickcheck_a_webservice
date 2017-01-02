@@ -48,7 +48,8 @@ command([]) ->
 command(State) ->
 	union([{call,kv_store,put,[key(),value()]},
 		{call,kv_store,get,[key(State)]},
-		{call,kv_store,erase,[key(State)]}]).
+		{call,kv_store,erase,[key(State)]},
+		{call,kv_store,reset,[]}]).
 
 key(State) ->
 	?LET({Key,_}, elements(State), Key).
@@ -71,11 +72,15 @@ postcondition(State, {call,kv_store,put,[Key,_]}, Old) ->
 postcondition(State, {call,kv_store,get,[Key]}, Val) ->
 	{Key,Val} =:= proplists:lookup(Key, State);
 postcondition(State, {call,kv_store,erase,[Key]}, Val) ->
-	{Key,Val} =:= proplists:lookup(Key, State).
+	{Key,Val} =:= proplists:lookup(Key, State);
+postcondition(_State, {call,kv_store,reset,[]}, '') ->
+	true.
 
 next_state(State, _Var, {call,kv_store,put,[Key,Value]}) ->
 	[{Key,Value}|proplists:delete(Key, State)];
 next_state(State, _Var, {call,kv_store,erase,[Key]}) ->
 	proplists:delete(Key, State);
 next_state(State, _Var, {call,kv_store,get,[_]}) ->
-	State.
+	State;
+next_state(_State, _Var, {call,kv_store,reset,[]}) ->
+	[].
