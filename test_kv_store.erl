@@ -10,8 +10,8 @@
 -type key() :: string().
 -type value() :: string().
 
--define(KEYS, ["a","b","c","d"]).
--define(VALUES, ["-1", "0", "1", "2", "3"]).
+-define(KEYS, ['a','b','c','d']).
+-define(VALUES, ['-1', '0', '1', '2', '3']).
 key() -> union(?KEYS).
 value() -> union(?VALUES).
 
@@ -64,7 +64,7 @@ precondition(_, _) ->
 %% precondition(_, {call,kv_store,put,[_K, _V]}) ->
 %%	true.
 
-postcondition(State, {call,kv_store,put,[Key,_]}, "") ->
+postcondition(State, {call,kv_store,put,[Key,_]}, '') ->
 	not proplists:is_defined(Key, State);
 postcondition(State, {call,kv_store,put,[Key,_]}, Old) ->
 	{Key,Old} =:= proplists:lookup(Key, State);
